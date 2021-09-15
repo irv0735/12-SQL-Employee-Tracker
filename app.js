@@ -1,10 +1,11 @@
 const express = require('express');
-const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const cTable = require('console.table');
 require('dotenv').config();
 
-const PORT = process.env.PORT;
+const inquirer = require('inquirer');
+const cTable = require('console.table');
+
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 const db = mysql.createConnection(
@@ -14,11 +15,31 @@ const db = mysql.createConnection(
     password: process.env.MYSQL_PW,
     database: 'company_db'
   },
-  console.log('Connected to the company_db database.')
+  console.log('**** EMPLOYEE MANAGER ****')
 );
 
+function init(){
+  inquirer.prompt(
+    [
+      {
+        type: 'list',
+        name: 'nextMove',
+        choices: ['View All Empoloyees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
+        message: "What would you like to do?"
+      }
+    ]
+  ).then((answer) => {
+    
+  })
+}
 
+
+// Default response for requests not found
+app.use((req, res) => {
+  res.status(404).end();
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  init();
 });
