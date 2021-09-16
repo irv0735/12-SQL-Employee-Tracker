@@ -16,7 +16,14 @@ const db = mysql.createConnection(
 );
 
 const viewEmployees = () => {
-  console.log('display employee list requested');
+  db.query(`SELECT employee.id AS id, first_name, last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, employee.manager_id AS manager
+            FROM employee
+            JOIN duty on employee.role_id = duty.id
+            JOIN department on department.id = duty.department_id`, (err, result) => {
+    if (err) throw err;
+    // need to update the manager to show the name instead of the manager ID. 
+    console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
+  });
 };
 
 const addEmployee = () => {
