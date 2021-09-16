@@ -1,4 +1,4 @@
-const express = require('express');
+// const express = require('express');
 // const mysql = require('mysql2');
 // require('dotenv').config();
 
@@ -6,8 +6,8 @@ const inquirer = require('inquirer');
 // const cTable = require('console.table');
 const prompts = require('./query/prompts.js');
 
-const PORT = process.env.PORT || 3001;
-const app = express();
+// const PORT = process.env.PORT || 3001;
+// const app = express();
 
 // const db = mysql.createConnection(
 //   {
@@ -25,7 +25,16 @@ function init(){
       {
         type: 'list',
         name: 'nextMove',
-        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Quit'],
+        choices: [
+                    'View All Employees', 
+                    'Add Employee', 
+                    'Update Employee Role', 
+                    'View All Roles', 
+                    'Add Role', 
+                    'View All Departments', 
+                    'Add Department', 
+                    'Quit'
+                  ],
         message: "What would you like to do?"
       }
     ]
@@ -67,11 +76,12 @@ function init(){
 }
 
 // Default response for requests not found
-app.use((req, res) => {
-  res.status(404).end();
-});
+// app.use((req, res) => {
+//   res.status(404).end();
+// });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  init();
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+//   init();
+// });
+init();

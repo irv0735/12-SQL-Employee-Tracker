@@ -40,34 +40,55 @@ const addEmployee = () => {
     });
   });
 
-//   inquirer.prompt(
-//     [
-//       {
-//         type: 'input',
-//         message: "Employee's first name?",
-//         name: 'first_name',
-//       },
-//       {
-//         type: 'input',
-//         message: "Employee's last name?",
-//         name: 'last_name',
-//       },
-//       {
-//         type: 'list',
-//         name: 'role_id',
-//         choices: roleList,
-//         message: "Employee's role?",       
-//       },
-//       {
-//         type: 'list',
-//         name: 'manager_id',
-//        // choices: [NEED A QUERY to retrieve the other employees]
-//         message: "Employee's manager?",
-//       }    
-//     ]
-//   ).then((response) => {
-//     //add employee to the database
-//   })
+  inquirer.prompt(
+    [
+      {
+        type: 'input',
+        message: "Employee's first name?",
+        name: 'first_name',
+      },
+      {
+        type: 'input',
+        message: "Employee's last name?",
+        name: 'last_name',
+      },
+      {
+        type: 'list',
+        name: 'role',
+        choices: roleList,
+        message: "Employee's role?",       
+      },
+      {
+        type: 'list',
+        name: 'manager',
+        choices: employeeList,
+        message: "Employee's manager?",
+      }    
+    ]
+  ).then((response) => {
+    let roleId = ""
+    db.query(`SELECT id FROM duty WHERE title = '${response.role}'`, (err, result) => {
+      if (err) {
+        console.log(err.message);
+      }
+      roleId = result.pop();
+    });
+    let managerArr = response.manager.split(" ");
+    let managerId = ""
+    db.query(`SELECT id FROM employee WHERE first_name = '${managerArr[0]}' and last_name = '${managerArr[1]}'`, (err, result) => {
+      if (err) {
+        console.log(err.message);
+      }
+      managerId = result.pop();
+    });
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+              VALUES (${response.first_name}, ${response.last_name}, ${roleId[0]}, ${managerId[0]})`, (err, res) => {
+      if (err) throw err;
+      else {
+        console.log("Employee Added successfully")
+      }
+    });   
+  });
 };
 
 const updateRole = () => {
