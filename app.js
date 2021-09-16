@@ -19,7 +19,7 @@ const prompts = require('./query/prompts.js');
 //   console.log('**** EMPLOYEE MANAGER ****')
 // );
 
-function init(){
+const init = () => {
   inquirer.prompt(
     [
       {
@@ -72,8 +72,8 @@ function init(){
         console.log("Exiting program. Goodbye!"); 
         break;
     }
-  })
-}
+  });
+};
 
 // Default response for requests not found
 // app.use((req, res) => {
@@ -85,3 +85,5 @@ function init(){
 //   init();
 // });
 init();
+
+module.exports = {init};

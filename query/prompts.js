@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
+const mainApp = require('../app.js');
 require('dotenv').config();
 
 const db = mysql.createConnection(
@@ -106,7 +107,11 @@ const addRole = () => {
 };
 
 const viewDepartments = () => {
-  console.log('view departments requested');
+  db.query(`SELECT * FROM department`, (err, result) => {
+    if (err) throw err;
+    console.table(['id', 'name'], result);
+  });
+  // mainApp.init();
 };
 
 const addDepartment = () => {
