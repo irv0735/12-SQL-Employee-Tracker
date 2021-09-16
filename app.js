@@ -4,7 +4,7 @@ const express = require('express');
 
 const inquirer = require('inquirer');
 // const cTable = require('console.table');
-const queries = require('./query/queries.js');
+const prompts = require('./query/prompts.js');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -19,7 +19,7 @@ const app = express();
 //   console.log('**** EMPLOYEE MANAGER ****')
 // );
 
-async function init(){
+function init(){
   inquirer.prompt(
     [
       {
@@ -32,32 +32,32 @@ async function init(){
   ).then((response) => {
     switch(response.nextMove) {
       case "View All Employees": 
-        await queries.viewEmployees();
-        init(); 
+        prompts.viewEmployees();
+       // init(); 
         break;
       case "Add Employee": 
-        await queries.addEmployee();
-        init(); 
+        prompts.addEmployee();
+       // init(); 
         break;
       case "Update Employee Role": 
-        await queries.updateRole();
-        init(); 
+        prompts.updateRole();
+       // init(); 
         break;
       case "View All Roles": 
-        await queries.viewRoles();
-        init(); 
+        prompts.viewRoles();
+        //init(); 
         break;
       case "Add Role": 
-        await queries.addRole();
-        init(); 
+        prompts.addRole();
+        ///init(); 
         break;
       case "View All Departments": 
-        await queries.viewDepartments();
-        init(); 
+        prompts.viewDepartments();
+        //init(); 
         break;
       case "Add Department": 
-        await queries.addDepartment();
-        init(); 
+        prompts.addDepartment();
+        //init(); 
       break;
       case "Quit": 
         console.log("Exiting program. Goodbye!"); 
