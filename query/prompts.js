@@ -21,8 +21,24 @@ const viewEmployees = () => {
             JOIN duty on employee.role_id = duty.id
             JOIN department on department.id = duty.department_id`, (err, result) => {
     if (err) throw err;
-    // need to update the manager to show the name instead of the manager ID. 
-    console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
+    // need to update the manager to show the name instead of the manager ID.
+    let managedArray = [];
+    result.forEach(element => {
+      if (element[6] != null) {
+        db.query(`SELECT first_name, last_name FROM employee WHERE id = ${element[6]}`, (err, result) => {
+          if (err) throw err;
+          let newManager = result[0].join(" ");
+          element.pop();
+          element.push(newManager);
+          managedArray.push(element);
+          console.log(managedArray);
+        })
+      } else {
+        managedArray.push(element);
+      }
+    });
+    // console.log(managedArray);
+    // console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], managedArray);
   });
 };
 
