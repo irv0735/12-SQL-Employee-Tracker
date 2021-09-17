@@ -55,13 +55,7 @@ const init = () => {
         break;
     }
   })
-  // .then((response) => {
-  //   if (response == true) {
-  //     init()
-  //   }
-  // })
 };
 
 init();
 
-module.exports = {init};
