@@ -16,29 +16,13 @@ const db = mysql.createConnection(
 );
 
 const viewEmployees = () => {
-  db.query(`SELECT employee.id AS id, first_name, last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, employee.manager_id AS manager
-            FROM employee
-            JOIN duty on employee.role_id = duty.id
-            JOIN department on department.id = duty.department_id`, (err, result) => {
+  db.query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
+            FROM employee e
+            JOIN duty on e.role_id = duty.id
+            JOIN department on department.id = duty.department_id
+            LEFT JOIN employee m on e.manager_id = m.id`, (err, result) => {
     if (err) throw err;
-    // need to update the manager to show the name instead of the manager ID.
-    let managedArray = [];
-    result.forEach(element => {
-      if (element[6] != null) {
-        db.query(`SELECT first_name, last_name FROM employee WHERE id = ${element[6]}`, (err, result) => {
-          if (err) throw err;
-          let newManager = result[0].join(" ");
-          element.pop();
-          element.push(newManager);
-          managedArray.push(element);
-          console.log(managedArray);
-        })
-      } else {
-        managedArray.push(element);
-      }
-    });
-    // console.log(managedArray);
-    // console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], managedArray);
+    console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
   });
 };
 
@@ -134,7 +118,6 @@ const viewDepartments = () => {
     if (err) throw err;
     console.table(['id', 'name'], result);
   });
-  // mainApp.init();
 };
 
 const addDepartment = () => {
