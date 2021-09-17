@@ -27,22 +27,22 @@ const init = () => {
         await prompts.promisifiedViewEmployees()
         break;
       case "Add Employee": 
-        prompts.addEmployee();
+        await prompts.promisifiedAddEmployee();
         break;
       case "Update Employee Role": 
-        prompts.updateRole();
+        await prompts.promisifiedUpdateRole();
         break;
       case "View All Roles": 
         await prompts.promisifiedViewRoles();
         break;
       case "Add Role": 
-        prompts.addRole();
+        await prompts.promisifiedAddRole();
         break;
       case "View All Departments": 
         await prompts.promisifiedViewDepartments();
         break;
       case "Add Department": 
-        prompts.addDepartment();
+        await prompts.promisifiedAddDepartment();
       break;
       case "Quit": 
         console.log("Exiting program. Goodbye!");

@@ -83,6 +83,7 @@ const addEmployee = () => {
       });
   });
 };
+const promisifiedAddEmployee = util.promisify(addEmployee);
 
 const addRole = () => {
   let departmentList = [];
@@ -128,6 +129,8 @@ const addRole = () => {
         });
   }); 
 };
+const promisifiedAddRole = util.promisify(addRole);
+
 const addDepartment = () => {
   inquirer.prompt(
     [
@@ -145,7 +148,7 @@ const addDepartment = () => {
               });
   });
 };
-
+const promisifiedAddDepartment = util.promisify(addDepartment);
 
 // View Table Data in specified formats
 const viewDepartments = () => {
@@ -220,14 +223,15 @@ const updateRole = () => {
     });
   });
 };
+const promisifiedUpdateRole = util.promisify(updateRole)
 
 
 module.exports = {
   promisifiedViewEmployees,
-  addEmployee,
-  updateRole,
+  promisifiedAddEmployee,
+  promisifiedUpdateRole,
   promisifiedViewRoles,
-  addRole,
+  promisifiedAddRole,
   promisifiedViewDepartments,
-  addDepartment,
+  promisifiedAddDepartment,
 };
