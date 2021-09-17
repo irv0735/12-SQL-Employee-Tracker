@@ -52,6 +52,8 @@ const init = () => {
     }
     if (restart) {
       init();
+    } else {
+      prompts.endConnection();
     }
   });
 };

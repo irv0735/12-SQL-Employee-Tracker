@@ -189,8 +189,8 @@ const updateRole = async () => {
         roleList.push(element[0]);
       });
     })
-    .then(() => {
-      inquirer.prompt(
+  
+  await inquirer.prompt(
         [
           {
             type: 'list',
@@ -206,16 +206,14 @@ const updateRole = async () => {
           }
         ]
       ).then( (response) => {
-        db.query(`UPDATE employee
+        db.promise().query(`UPDATE employee
                   SET role_id = (SELECT id FROM duty WHERE title = '${response.newRole}')
-                  WHERE concat(first_name, " ", last_name) = '${response.employee}'`, (err, result) => {
-                    if (err) throw err;
-                    console.log(`Updated employee's role`)
-                  });           
-      });
+                  WHERE concat(first_name, " ", last_name) = '${response.employee}'`)
+        console.log(`Updated employee's role`)           
     });
 };
 
+const endConnection = () => db.end();
 
 
 module.exports = {
@@ -226,4 +224,5 @@ module.exports = {
   addRole,
   viewDepartments,
   addDepartment,
+  endConnection,
 };
