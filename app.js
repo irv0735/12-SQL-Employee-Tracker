@@ -24,7 +24,7 @@ const init = () => {
     switch(response.nextMove) {
       case "View All Employees": 
         prompts.viewEmployees()
-        init()
+        // init()
         break;
       case "Add Employee": 
         prompts.addEmployee();

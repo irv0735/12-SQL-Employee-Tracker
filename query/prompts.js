@@ -125,7 +125,21 @@ const viewDepartments = () => {
 
 const addDepartment = () => {
   // department_name
-  console.log('add department requested.');
+  inquirer.prompt(
+    [
+      {
+        type: 'input',
+        name: 'newDepartment',
+        message: 'What is the name of the new department?'
+      }
+    ]
+  ).then((response) => {
+    db.query(`INSERT INTO department (department_name)
+              VALUES ("${response.newDepartment}")`, (err, result) => {
+                if (err) throw err;
+                console.log(`Added ${response.newDepartment} to the database.`)
+              });
+  });
 };
 
 module.exports = {
