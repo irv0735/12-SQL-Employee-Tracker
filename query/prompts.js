@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const mainApp = require('../app.js');
+const util = require('util');
 require('dotenv').config();
 
 const db = mysql.createConnection(
@@ -27,7 +28,7 @@ const viewEmployees = () => {
 };
 
 const addEmployee = () => {
-  // first_name, last_name, role_id, manager_id
+
   let roleList = [];
   db.query(`SELECT title FROM duty`, (err, rows) => {
     if (err) {
@@ -75,27 +76,26 @@ const addEmployee = () => {
     ]
   ).then((response) => {
     let roleId = ""
-    db.query(`SELECT id FROM duty WHERE title = '${response.role}'`, (err, result) => {
-      if (err) {
-        console.log(err.message);
-      }
-      roleId = result.pop();
-    });
     let managerArr = response.manager.split(" ");
     let managerId = ""
-    db.query(`SELECT id FROM employee WHERE first_name = '${managerArr[0]}' and last_name = '${managerArr[1]}'`, (err, result) => {
-      if (err) {
-        console.log(err.message);
-      }
-      managerId = result.pop();
-    });
-    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
-              VALUES (${response.first_name}, ${response.last_name}, ${roleId[0]}, ${managerId[0]})`, (err, res) => {
-      if (err) throw err;
-      else {
-        console.log("Employee Added successfully")
-      }
-    });   
+
+    db.promise().query(`SELECT id FROM duty WHERE title = '${response.role}'`)
+      .then( ([row]) => {
+        roleId = row[0].pop();
+      })
+      .then( () => {
+        db.promise().query(`SELECT id FROM employee WHERE first_name = '${managerArr[0]}' and last_name = '${managerArr[1]}'`)
+          .then( ([row]) => {
+            managerId = row[0].pop();
+          })
+          .then( () => {
+            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                      VALUES ('${response.first_name}', '${response.last_name}', ${roleId}, ${managerId})`, (err, res) => {
+              if (err) throw err;
+              console.log("Employee Added successfully");
+            }); 
+          });   
+      });
   });
 };
 

@@ -1,23 +1,5 @@
-// const express = require('express');
-// const mysql = require('mysql2');
-// require('dotenv').config();
-
 const inquirer = require('inquirer');
-// const cTable = require('console.table');
 const prompts = require('./query/prompts.js');
-
-// const PORT = process.env.PORT || 3001;
-// const app = express();
-
-// const db = mysql.createConnection(
-//   {
-//     host: 'localhost',
-//     user: 'root',
-//     password: process.env.MYSQL_PW,
-//     database: 'company_db'
-//   },
-//   console.log('**** EMPLOYEE MANAGER ****')
-// );
 
 const init = () => {
   inquirer.prompt(
