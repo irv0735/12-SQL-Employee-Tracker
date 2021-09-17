@@ -70,16 +70,18 @@ const addEmployee = async () => {
       .then( () => {
         db.promise().query(`SELECT id FROM employee WHERE first_name = '${managerArr[0]}' and last_name = '${managerArr[1]}'`)
           .then( ([row]) => {
-            managerId = row[0].pop();
+            if (row[0]) {
+              managerId = row[0].pop();
+            } else {
+              managerId = null;
+            }
           })
           .then( () => {
-            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
-                      VALUES ('${response.first_name}', '${response.last_name}', ${roleId}, ${managerId})`, (err, res) => {
-              if (err) throw err;
-              console.log("Employee Added successfully");
-            }); 
-          });   
-      });
+            db.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                      VALUES ('${response.first_name}', '${response.last_name}', ${roleId}, ${managerId})`)
+          }); 
+      });   
+      console.log("Employee Added successfully");
   });
 };
 
@@ -118,17 +120,12 @@ const addRole = async () => {
     db.promise().query(`SELECT id FROM department WHERE department_name = '${response.department_name}'`)
       .then( ([row]) => {
         departmentId = row[0].pop();
-      })
-        .then( () => {
-          db.query(`INSERT INTO duty (title, salary, department_id)
-                    VALUES ('${response.title}', ${response.salary}, ${departmentId})`, (err, result) => {
-                      if (err) throw err;
-                      console.log(`Added ${response.title} to the database.`);  
-                    });
-        });
+        db.promise().query(`INSERT INTO duty (title, salary, department_id)
+                            VALUES ('${response.title}', ${response.salary}, ${departmentId})`)
+      });
+    console.log(`Added ${response.title} to the database.`);  
   }); 
 };
-
 
 const addDepartment = async () => {
   await inquirer.prompt(
@@ -140,11 +137,9 @@ const addDepartment = async () => {
       }
     ]
   ).then((response) => {
-    db.query(`INSERT INTO department (department_name)
-              VALUES ("${response.newDepartment}")`, (err, result) => {
-                if (err) throw err;
-                console.log(`Added ${response.newDepartment} to the database.`)
-              });
+    db.promise().query(`INSERT INTO department (department_name)
+                        VALUES ("${response.newDepartment}")`)
+    console.log(`Added ${response.newDepartment} to the database.`)
   });
 };
 
@@ -155,9 +150,7 @@ const viewDepartments = async () => {
     .then( ([result]) => {
       console.table(['id', 'name'], result);
     })
-    .catch(console.log)
 };
-
 
 const viewRoles = async () => {
   await db.promise().query(`SELECT duty.id as id, title, department.department_name as department, salary 
@@ -168,14 +161,13 @@ const viewRoles = async () => {
     })
 };
 
-
 const viewEmployees = async () => {
   await db.promise().query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
             FROM employee e
             JOIN duty on e.role_id = duty.id
             JOIN department on department.id = duty.department_id
             LEFT JOIN employee m on e.manager_id = m.id`)
-    .then(([result]) => {
+    .then( ([result]) => {
       console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
     })
 };
@@ -185,43 +177,43 @@ const viewEmployees = async () => {
 const updateRole = async () => {
   let employeeList = [];
   let roleList = [];
-  db.query(`SELECT concat(first_name, " ", last_name) FROM employee`, (err, result) => {
-    if (err) throw err;
-    result.forEach(element => {
-      employeeList.push(element[0]);
-    });
-  });
+  await db.promise().query(`SELECT concat(first_name, " ", last_name) FROM employee`)
+          .then( ([result]) => {
+            result.forEach(element => {
+            employeeList.push(element[0]);
+            });
+          });
   await db.promise().query(`SELECT title FROM duty`)
     .then( ([rows]) => {
       rows.forEach(element => {
         roleList.push(element[0]);
       });
     })
-  .then(() => {
-    inquirer.prompt(
-      [
-        {
-          type: 'list',
-          name: 'employee',
-          choices: employeeList,
-          message: "Which employee's role do you want to update?"
-        },
-        {
-          type: 'list',
-          name: 'newRole',
-          choices: roleList,
-          message: "Which role to you want to assign the selected employee?"
-        }
-      ]
-    ).then( (response) => {
-      db.query(`UPDATE employee
-                SET role_id = (SELECT id FROM duty WHERE title = '${response.newRole}')
-                WHERE concat(first_name, " ", last_name) = '${response.employee}'`, (err, result) => {
-                  if (err) throw err;
-                  console.log(`Updated employee's role`)
-                });           
+    .then(() => {
+      inquirer.prompt(
+        [
+          {
+            type: 'list',
+            name: 'employee',
+            choices: employeeList,
+            message: "Which employee's role do you want to update?"
+          },
+          {
+            type: 'list',
+            name: 'newRole',
+            choices: roleList,
+            message: "Which role to you want to assign the selected employee?"
+          }
+        ]
+      ).then( (response) => {
+        db.query(`UPDATE employee
+                  SET role_id = (SELECT id FROM duty WHERE title = '${response.newRole}')
+                  WHERE concat(first_name, " ", last_name) = '${response.employee}'`, (err, result) => {
+                    if (err) throw err;
+                    console.log(`Updated employee's role`)
+                  });           
+      });
     });
-  });
 };
 
 
