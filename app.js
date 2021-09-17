@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const prompts = require('./query/prompts.js');
+let restart = true;
 
 const init = () => {
   inquirer.prompt(
@@ -20,41 +21,38 @@ const init = () => {
         message: "What would you like to do?"
       }
     ]
-  ).then((response) => {
+  ).then(async response => {
     switch(response.nextMove) {
       case "View All Employees": 
-        prompts.viewEmployees()
-        // init()
+        await prompts.promisifiedViewEmployees()
         break;
       case "Add Employee": 
         prompts.addEmployee();
-       // init(); 
         break;
       case "Update Employee Role": 
         prompts.updateRole();
-       // init(); 
         break;
       case "View All Roles": 
-        prompts.viewRoles();
-        //init(); 
+        await prompts.promisifiedViewRoles();
         break;
       case "Add Role": 
         prompts.addRole();
-        ///init(); 
         break;
       case "View All Departments": 
-        prompts.viewDepartments();
-        //init(); 
+        await prompts.promisifiedViewDepartments();
         break;
       case "Add Department": 
         prompts.addDepartment();
-        //init(); 
       break;
       case "Quit": 
-        console.log("Exiting program. Goodbye!"); 
+        console.log("Exiting program. Goodbye!");
+        restart = false; 
         break;
     }
-  })
+    if (restart) {
+      init();
+    }
+  });
 };
 
 init();

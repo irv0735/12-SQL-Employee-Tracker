@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
+const util = require('util');
 require('dotenv').config();
 
 const db = mysql.createConnection(
@@ -25,7 +26,6 @@ const addEmployee = () => {
       roleList.push(element[0]);
     });
   });
-
   let employeeList = ["None"];
   db.query(`SELECT first_name, last_name FROM employee`, (err, rows) => {
     if (err) {
@@ -35,7 +35,6 @@ const addEmployee = () => {
       employeeList.push(element[0] + " " + element[1]);
     });
   });
-
   inquirer.prompt(
     [
       {
@@ -65,7 +64,6 @@ const addEmployee = () => {
     let roleId = ""
     let managerArr = response.manager.split(" ");
     let managerId = ""
-
     db.promise().query(`SELECT id FROM duty WHERE title = '${response.role}'`)
       .then( ([row]) => {
         roleId = row[0].pop();
@@ -96,7 +94,6 @@ const addRole = () => {
       departmentList.push(element[0]);
     });
   });
-
   inquirer.prompt(
     [
       {
@@ -131,7 +128,6 @@ const addRole = () => {
         });
   }); 
 };
-
 const addDepartment = () => {
   inquirer.prompt(
     [
@@ -152,37 +148,38 @@ const addDepartment = () => {
 
 
 // View Table Data in specified formats
-
 const viewDepartments = () => {
-  db.query(`SELECT * FROM department`, (err, result) => {
-    if (err) throw err;
-    console.table(['id', 'name'], result);
-  });
+  db.promise().query(`SELECT * FROM department`)
+    .then( ([result]) => {
+      console.table(['id', 'name'], result);
+    })
 };
+const promisifiedViewDepartments = util.promisify(viewDepartments);
 
 const viewRoles = () => {
-  db.query(`SELECT duty.id as id, title, department.department_name as department, salary 
+  db.promise().query(`SELECT duty.id as id, title, department.department_name as department, salary 
             FROM duty
-            JOIN department on duty.department_id = department.id`, (err, result) => {
-    if (err) throw err;
-    console.table(['id', 'title', 'department', 'salary'], result);
-  });
+            JOIN department on duty.department_id = department.id`)
+    .then( ([result]) => {
+      console.table(['id', 'title', 'department', 'salary'], result);
+    })
 };
+const promisifiedViewRoles = util.promisify(viewRoles);
 
 const viewEmployees = () => {
-  db.query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
+  db.promise().query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
             FROM employee e
             JOIN duty on e.role_id = duty.id
             JOIN department on department.id = duty.department_id
-            LEFT JOIN employee m on e.manager_id = m.id`, (err, result) => {
-              if (err) throw err;
-              console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
-              });
+            LEFT JOIN employee m on e.manager_id = m.id`)
+    .then(([result]) => {
+      console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
+    })
 };
+const promisifiedViewEmployees = util.promisify(viewEmployees);
 
 // Update employee Role
 const updateRole = () => {
-
   let employeeList = [];
   let roleList = [];
   db.query(`SELECT concat(first_name, " ", last_name) FROM employee`, (err, result) => {
@@ -198,7 +195,6 @@ const updateRole = () => {
       });
     })
   .then(() => {
-  
     inquirer.prompt(
       [
         {
@@ -220,18 +216,18 @@ const updateRole = () => {
                 WHERE concat(first_name, " ", last_name) = '${response.employee}'`, (err, result) => {
                   if (err) throw err;
                   console.log(`Updated employee's role`)
-                });
-                
+                });           
     });
   });
 };
 
+
 module.exports = {
-  viewEmployees,
+  promisifiedViewEmployees,
   addEmployee,
   updateRole,
-  viewRoles,
+  promisifiedViewRoles,
   addRole,
-  viewDepartments,
+  promisifiedViewDepartments,
   addDepartment,
 };
