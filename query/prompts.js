@@ -14,12 +14,6 @@ const db = mysql.createConnection(
   console.log('**** EMPLOYEE MANAGER ****')
 );
 
-// Update employee Role
-const updateRole = () => {
-  // employee_id, role_id
-  console.log('update role requested');
-};
-
 // Add Section for new row to specified table: 
 const addEmployee = () => {
   let roleList = [];
@@ -184,6 +178,52 @@ const viewEmployees = () => {
               if (err) throw err;
               console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
               });
+};
+
+// Update employee Role
+const updateRole = () => {
+
+  let employeeList = [];
+  let roleList = [];
+  db.query(`SELECT concat(first_name, " ", last_name) FROM employee`, (err, result) => {
+    if (err) throw err;
+    result.forEach(element => {
+      employeeList.push(element[0]);
+    });
+  });
+  db.promise().query(`SELECT title FROM duty`)
+    .then( ([rows]) => {
+      rows.forEach(element => {
+        roleList.push(element[0]);
+      });
+    })
+  .then(() => {
+  
+    inquirer.prompt(
+      [
+        {
+          type: 'list',
+          name: 'employee',
+          choices: employeeList,
+          message: "Which employee's role do you want to update?"
+        },
+        {
+          type: 'list',
+          name: 'newRole',
+          choices: roleList,
+          message: "Which role to you want to assign the selected employee?"
+        }
+      ]
+    ).then( (response) => {
+      db.query(`UPDATE employee
+                SET role_id = (SELECT id FROM duty WHERE title = '${response.newRole}')
+                WHERE concat(first_name, " ", last_name) = '${response.employee}'`, (err, result) => {
+                  if (err) throw err;
+                  console.log(`Updated employee's role`)
+                });
+                
+    });
+  });
 };
 
 module.exports = {
