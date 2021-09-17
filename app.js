@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const prompts = require('./query/prompts.js');
+
 let restart = true;
 
 const init = () => {
@@ -24,26 +25,26 @@ const init = () => {
   ).then(async response => {
     switch(response.nextMove) {
       case "View All Employees": 
-        await prompts.promisifiedViewEmployees()
+        await prompts.viewEmployees()
         break;
       case "Add Employee": 
-        await prompts.promisifiedAddEmployee();
+        await prompts.addEmployee();
         break;
       case "Update Employee Role": 
-        await prompts.promisifiedUpdateRole();
+        await prompts.updateRole();
         break;
       case "View All Roles": 
-        await prompts.promisifiedViewRoles();
+        await prompts.viewRoles();
         break;
       case "Add Role": 
-        await prompts.promisifiedAddRole();
+        await prompts.addRole();
         break;
       case "View All Departments": 
-        await prompts.promisifiedViewDepartments();
+        await prompts.viewDepartments();
         break;
       case "Add Department": 
-        await prompts.promisifiedAddDepartment();
-      break;
+        await prompts.addDepartment();
+        break;
       case "Quit": 
         console.log("Exiting program. Goodbye!");
         restart = false; 

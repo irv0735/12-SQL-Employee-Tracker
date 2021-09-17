@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const util = require('util');
 require('dotenv').config();
 
 const db = mysql.createConnection(
@@ -16,7 +15,7 @@ const db = mysql.createConnection(
 );
 
 // Add Section for new row to specified table: 
-const addEmployee = () => {
+const addEmployee = async () => {
   let roleList = [];
   db.query(`SELECT title FROM duty`, (err, rows) => {
     if (err) {
@@ -35,7 +34,7 @@ const addEmployee = () => {
       employeeList.push(element[0] + " " + element[1]);
     });
   });
-  inquirer.prompt(
+  await inquirer.prompt(
     [
       {
         type: 'input',
@@ -83,9 +82,9 @@ const addEmployee = () => {
       });
   });
 };
-const promisifiedAddEmployee = util.promisify(addEmployee);
 
-const addRole = () => {
+
+const addRole = async () => {
   let departmentList = [];
   db.query(`SELECT department_name FROM department`, (err, rows) => {
     if (err) {
@@ -95,7 +94,7 @@ const addRole = () => {
       departmentList.push(element[0]);
     });
   });
-  inquirer.prompt(
+  await inquirer.prompt(
     [
       {
         type: 'input',
@@ -129,10 +128,10 @@ const addRole = () => {
         });
   }); 
 };
-const promisifiedAddRole = util.promisify(addRole);
 
-const addDepartment = () => {
-  inquirer.prompt(
+
+const addDepartment = async () => {
+  await inquirer.prompt(
     [
       {
         type: 'input',
@@ -148,29 +147,30 @@ const addDepartment = () => {
               });
   });
 };
-const promisifiedAddDepartment = util.promisify(addDepartment);
+
 
 // View Table Data in specified formats
-const viewDepartments = () => {
-  db.promise().query(`SELECT * FROM department`)
+const viewDepartments = async () => {
+  await db.promise().query(`SELECT * FROM department`)
     .then( ([result]) => {
       console.table(['id', 'name'], result);
     })
+    .catch(console.log)
 };
-const promisifiedViewDepartments = util.promisify(viewDepartments);
 
-const viewRoles = () => {
-  db.promise().query(`SELECT duty.id as id, title, department.department_name as department, salary 
+
+const viewRoles = async () => {
+  await db.promise().query(`SELECT duty.id as id, title, department.department_name as department, salary 
             FROM duty
             JOIN department on duty.department_id = department.id`)
     .then( ([result]) => {
       console.table(['id', 'title', 'department', 'salary'], result);
     })
 };
-const promisifiedViewRoles = util.promisify(viewRoles);
 
-const viewEmployees = () => {
-  db.promise().query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
+
+const viewEmployees = async () => {
+  await db.promise().query(`SELECT e.id AS id, e.first_name, e.last_name, duty.title AS title, department.department_name as department, duty.salary AS salary, concat(m.first_name, " " , m.last_name) AS manager
             FROM employee e
             JOIN duty on e.role_id = duty.id
             JOIN department on department.id = duty.department_id
@@ -179,10 +179,10 @@ const viewEmployees = () => {
       console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
     })
 };
-const promisifiedViewEmployees = util.promisify(viewEmployees);
+
 
 // Update employee Role
-const updateRole = () => {
+const updateRole = async () => {
   let employeeList = [];
   let roleList = [];
   db.query(`SELECT concat(first_name, " ", last_name) FROM employee`, (err, result) => {
@@ -191,7 +191,7 @@ const updateRole = () => {
       employeeList.push(element[0]);
     });
   });
-  db.promise().query(`SELECT title FROM duty`)
+  await db.promise().query(`SELECT title FROM duty`)
     .then( ([rows]) => {
       rows.forEach(element => {
         roleList.push(element[0]);
@@ -223,15 +223,15 @@ const updateRole = () => {
     });
   });
 };
-const promisifiedUpdateRole = util.promisify(updateRole)
+
 
 
 module.exports = {
-  promisifiedViewEmployees,
-  promisifiedAddEmployee,
-  promisifiedUpdateRole,
-  promisifiedViewRoles,
-  promisifiedAddRole,
-  promisifiedViewDepartments,
-  promisifiedAddDepartment,
+  viewEmployees,
+  addEmployee,
+  updateRole,
+  viewRoles,
+  addRole,
+  viewDepartments,
+  addDepartment,
 };
