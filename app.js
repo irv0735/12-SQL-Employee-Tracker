@@ -23,8 +23,8 @@ const init = () => {
   ).then((response) => {
     switch(response.nextMove) {
       case "View All Employees": 
-        prompts.viewEmployees();
-       // init(); 
+        prompts.viewEmployees()
+        init()
         break;
       case "Add Employee": 
         prompts.addEmployee();
@@ -54,7 +54,12 @@ const init = () => {
         console.log("Exiting program. Goodbye!"); 
         break;
     }
-  });
+  })
+  // .then((response) => {
+  //   if (response == true) {
+  //     init()
+  //   }
+  // })
 };
 
 init();

@@ -1,8 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const mainApp = require('../app.js');
-const util = require('util');
 require('dotenv').config();
 
 const db = mysql.createConnection(
@@ -22,9 +20,9 @@ const viewEmployees = () => {
             JOIN duty on e.role_id = duty.id
             JOIN department on department.id = duty.department_id
             LEFT JOIN employee m on e.manager_id = m.id`, (err, result) => {
-    if (err) throw err;
-    console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
-  });
+              if (err) throw err;
+              console.table(['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'], result);
+              });
 };
 
 const addEmployee = () => {
@@ -105,7 +103,12 @@ const updateRole = () => {
 };
 
 const viewRoles = () => {
-  console.log('view roles requested');
+  db.query(`SELECT duty.id as id, title, department.department_name as department, salary 
+            FROM duty
+            JOIN department on duty.department_id = department.id`, (err, result) => {
+    if (err) throw err;
+    console.table(['id', 'title', 'department', 'salary'], result);
+  });
 };
 
 const addRole = () => {
